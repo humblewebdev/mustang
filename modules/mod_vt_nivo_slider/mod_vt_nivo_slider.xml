@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install type="module" version="1.5.0" client="site" method="upgrade">
+	<name>Vinaora Nivo Slider</name>
+	<author>VINAORA</author>
+	<creationDate>March 2012</creationDate>
+	<copyright>Copyright (C) 2010-2012 VINAORA. All rights reserved.</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<authorEmail>info@vinaora.com</authorEmail>
+	<authorUrl>http://vinaora.com</authorUrl>
+	<version>1.5.0</version>
+	<description>MOD_VT_NIVO_SLIDER_XML_DESCRIPTION</description>
+	<files>
+		<filename module="mod_vt_nivo_slider">mod_vt_nivo_slider.php</filename>
+		<filename>helper.php</filename>
+		<filename>index.html</filename>
+		<folder>fields</folder>
+		<folder>helper</folder>
+		<folder>tmpl</folder>
+	</files>
+	
+	<media folder="media" destination="mod_vt_nivo_slider">
+		<filename>index.html</filename>
+		<folder>css</folder>
+		<folder>images</folder>
+		<folder>js</folder>
+		<folder>themes</folder>
+	</media>
+
+	<languages>
+		<language tag="en-GB">language/en-GB.mod_vt_nivo_slider.ini</language>
+		<language tag="en-GB">language/en-GB.mod_vt_nivo_slider.sys.ini</language>
+	</languages>
+	<params>
+		<param name="item_dir" type="folderlist" directory="images" filter="" exclude="" hide_none="0" hide_default="1" label="MOD_VT_NIVO_SLIDER_FIELD_ITEM_DIR" description="MOD_VT_NIVO_SLIDER_FIELD_ITEM_DIR_DESC" />
+		<param name="item_title" type="textarea" rows="5" cols="30" default="" label="MOD_VT_NIVO_SLIDER_FIELD_ITEM_TITLE" description="MOD_VT_NIVO_SLIDER_FIELD_ITEM_TITLE_DESC" />
+		<param name="item_url" type="textarea" rows="5" cols="30" default="" label="MOD_VT_NIVO_SLIDER_FIELD_ITEM_URL" description="MOD_VT_NIVO_SLIDER_FIELD_ITEM_URL_DESC" />
+		<param name="item_target" type="list" default="_blank" label="MOD_VT_NIVO_SLIDER_FIELD_ITEM_TARGET" description="MOD_VT_NIVO_SLIDER_FIELD_ITEM_TARGET_DESC" >
+			<option value="_blank">MOD_VT_NIVO_SLIDER_OPTION_LINK_TARGET_BLANK</option>
+			<option value="_self">MOD_VT_NIVO_SLIDER_OPTION_LINK_TARGET_SELF</option>
+			<option value="_parent">MOD_VT_NIVO_SLIDER_OPTION_LINK_TARGET_PARENT</option>
+			<option value="_top">MOD_VT_NIVO_SLIDER_OPTION_LINK_TARGET_TOP</option>
+		</param>
+		<param type="spacer" name="@spacer1" hr="true" />
+		<param name="theme" type="folderlist" default="default" directory="media/mod_vt_nivo_slider/themes" filter="" exclude="" stripext="" hide_none="1" hide_default="1" label="MOD_VT_NIVO_SLIDER_FIELD_THEME" description="MOD_VT_NIVO_SLIDER_FIELD_THEME_DESC" />
+		<param name="effect" type="list" default="random" label="MOD_VT_NIVO_SLIDER_FIELD_EFFECT" description="MOD_VT_NIVO_SLIDER_FIELD_EFFECT_DESC">
+			<option value="sliceDown">MOD_VT_NIVO_SLIDER_OPTION_EFFECT_SLICEDOWN</option>
+			<option value="sliceDownLeft">MOD_VT_NIVO_SLIDER_OPTION_EFFECT_SLICEDOWNLEFT</option>
+			<option value="sliceUp">MOD_VT_NIVO_SLIDER_OPTION_EFFECT_SLICEUP</option>
+			<option value="sliceUpLeft">MOD_VT_NIVO_SLIDER_OPTION_EFFECT_SLICEUPLEFT</option>
+			<option value="sliceUpDown">MOD_VT_NIVO_SLIDER_OPTION_EFFECT_SLICEUPDOWN</option>
+			<option value="sliceUpDownLeft">MOD_VT_NIVO_SLIDER_OPTION_EFFECT_SLICEUPDOWNLEFT</option>
+			<option value="fold">MOD_VT_NIVO_SLIDER_OPTION_EFFECT_FOLD</option>
+			<option value="fade">MOD_VT_NIVO_SLIDER_OPTION_EFFECT_FADE</option>
+			<option value="random">MOD_VT_NIVO_SLIDER_OPTION_EFFECT_RANDOM</option>
+			<option value="slideInRight">MOD_VT_NIVO_SLIDER_OPTION_EFFECT_SLIDEINRIGHT</option>
+			<option value="slideInLeft">MOD_VT_NIVO_SLIDER_OPTION_EFFECT_SLIDEINLEFT</option>
+			<option value="boxRandom">MOD_VT_NIVO_SLIDER_OPTION_EFFECT_BOXRANDOM</option>
+			<option value="boxRain">MOD_VT_NIVO_SLIDER_OPTION_EFFECT_BOXRAIN</option>
+			<option value="boxRainReverse">MOD_VT_NIVO_SLIDER_OPTION_EFFECT_BOXRAINREVERSE</option>
+			<option value="boxRainGrow">MOD_VT_NIVO_SLIDER_OPTION_EFFECT_BOXRAINGROW</option>
+			<option value="boxRainGrowReverse">MOD_VT_NIVO_SLIDER_OPTION_EFFECT_BOXRAINGROWREVERSE</option>
+		</param>
+		<param name="slices" type="text" default="15" label="MOD_VT_NIVO_SLIDER_FIELD_SLICES" description="MOD_VT_NIVO_SLIDER_FIELD_SLICES_DESC" />
+		<param name="boxCols" type="text" default="8" label="MOD_VT_NIVO_SLIDER_FIELD_BOXCOLS" description="MOD_VT_NIVO_SLIDER_FIELD_BOXCOLS_DESC" />
+		<param name="boxRows" type="text" default="4" label="MOD_VT_NIVO_SLIDER_FIELD_BOXROWS" description="MOD_VT_NIVO_SLIDER_FIELD_BOXROWS_DESC" />
+		<param name="animSpeed" type="text" default="500" label="MOD_VT_NIVO_SLIDER_FIELD_ANIMSPEED" description="MOD_VT_NIVO_SLIDER_FIELD_ANIMSPEED_DESC" />
+		<param name="pauseTime" type="text" default="3000" label="MOD_VT_NIVO_SLIDER_FIELD_PAUSETIME" description="MOD_VT_NIVO_SLIDER_FIELD_PAUSETIME_DESC" />
+		<param name="startSlide" type="text" default="0" label="MOD_VT_NIVO_SLIDER_FIELD_STARTSLIDE" description="MOD_VT_NIVO_SLIDER_FIELD_STARTSLIDE_DESC" />
+		<param type="spacer" name="@spacer2" hr="true" />
+		<param name="directionNav" type="radio" default="1" label="MOD_VT_NIVO_SLIDER_FIELD_DIRECTIONNAV" description="MOD_VT_NIVO_SLIDER_FIELD_DIRECTIONNAV_DESC">
+			<option value="1">JYES</option>
+			<option value="0">JNO</option>
+		</param>
+		<param name="directionNavHide" type="radio" default="1" label="MOD_VT_NIVO_SLIDER_FIELD_DIRECTIONNAVHIDE" description="MOD_VT_NIVO_SLIDER_FIELD_DIRECTIONNAVHIDE_DESC">
+			<option value="1">JYES</option>
+			<option value="0">JNO</option>
+		</param>
+		<param name="controlNav" type="radio" default="1" label="MOD_VT_NIVO_SLIDER_FIELD_CONTROLNAV" description="MOD_VT_NIVO_SLIDER_FIELD_CONTROLNAV_DESC">
+			<option value="1">JYES</option>
+			<option value="0">JNO</option>
+		</param>
+		<param type="spacer" name="@spacer4" hr="true" />
+		<param name="keyboardNav" type="radio" default="1" label="MOD_VT_NIVO_SLIDER_FIELD_KEYBOARDNAV" description="MOD_VT_NIVO_SLIDER_FIELD_KEYBOARDNAV_DESC">
+			<option value="1">JYES</option>
+			<option value="0">JNO</option>
+		</param>
+		<param name="pauseOnHover" type="radio" default="1" label="MOD_VT_NIVO_SLIDER_FIELD_PAUSEONHOVER" description="MOD_VT_NIVO_SLIDER_FIELD_PAUSEONHOVER_DESC">
+			<option value="1">JYES</option>
+			<option value="0">JNO</option>
+		</param>
+		<param name="manualAdvance" type="radio" default="0" label="MOD_VT_NIVO_SLIDER_FIELD_MANUALADVANCE" description="MOD_VT_NIVO_SLIDER_FIELD_MANUALADVANCE_DESC">
+			<option value="0">JYES</option>
+			<option value="1">JNO</option>
+		</param>
+		<param type="spacer" name="@spacer5" hr="true" />
+		<param name="captionOpacity" type="text" default="80" label="MOD_VT_NIVO_SLIDER_FIELD_CAPTIONOPACITY" description="MOD_VT_NIVO_SLIDER_FIELD_CAPTIONOPACITY_DESC" />
+		<param name="prevText" type="text" default="Prev" label="MOD_VT_NIVO_SLIDER_FIELD_PREVTEXT" description="MOD_VT_NIVO_SLIDER_FIELD_PREVTEXT_DESC" />
+		<param name="nextText" type="text" default="Next" label="MOD_VT_NIVO_SLIDER_FIELD_NEXTTEXT" description="MOD_VT_NIVO_SLIDER_FIELD_NEXTTEXT_DESC" />
+	</params>
+	<params group="advanced">
+	<param name="jquery_source" type="list" default="local" label="MOD_VT_NIVO_SLIDER_FIELD_JQUERY_SOURCE" description="MOD_VT_NIVO_SLIDER_FIELD_JQUERY_SOURCE_DESC">
+			<option value="local">MOD_VT_NIVO_SLIDER_OPTION_JQUERY_SOURCE_LOCAL</option>
+			<option value="google">MOD_VT_NIVO_SLIDER_OPTION_JQUERY_SOURCE_GOOGLE</option>
+			<option value="none">JNONE</option>
+		</param>
+		<param name="jquery_version" type="folderlist" default="1.7.1" directory="media/mod_vt_nivo_slider/js/jquery/" filter="" exclude="" stripext="" hide_none="1" hide_default="1" label="MOD_VT_NIVO_SLIDER_FIELD_JQUERY_VERSION" description="MOD_VT_NIVO_SLIDER_FIELD_JQUERY_VERSION_DESC" />
+		<param type="spacer" name="@space6" hr="true" />
+		<!--
+		<param name="controlNavThumbs" type="radio" default="true" label="MOD_VT_NIVO_SLIDER_FIELD_CONTROLNAVTHUMBS" description="MOD_VT_NIVO_SLIDER_FIELD_CONTROLNAVTHUMBS_DESC">
+			<option value="1">JYES</option>
+			<option value="0">JNO</option>
+		</param>
+		<param name="controlNavThumbsFromRel" type="radio" default="true" label="MOD_VT_NIVO_SLIDER_FIELD_CONTROLNAVTHUMBSFROMREL" description="MOD_VT_NIVO_SLIDER_FIELD_CONTROLNAVTHUMBSFROMREL_DESC">
+			<option value="1">JYES</option>
+			<option value="0">JNO</option>
+		</param>
+		<param name="controlNavThumbsSearch" type="text" default=".jpg" label="MOD_VT_NIVO_SLIDER_FIELD_CONTROLNAVTHUMBSSEARCH" description="MOD_VT_NIVO_SLIDER_FIELD_CONTROLNAVTHUMBSSEARCH_DESC" />
+		<param name="controlNavThumbsReplace" type="text" default="_thumb.jpg" label="MOD_VT_NIVO_SLIDER_FIELD_CONTROLNAVTHUMBSREPLACE" description="MOD_VT_NIVO_SLIDER_FIELD_CONTROLNAVTHUMBSREPLACE_DESC" />
+		<param name="@spacer" type="spacer" default="" label="" description="" />
+		-->
+		<param name="layout" type="filelist" default="default" directory="modules/mod_vt_nivo_slider/tmpl" filter="[^\s]+\.php$" exclude="" stripext=".php" hide_none="1" hide_default="1" label="MOD_VT_NIVO_SLIDER_FIELD_LAYOUT" description="MOD_VT_NIVO_SLIDER_FIELD_LAYOUT_DESC" />
+		<param name="moduleclass_sfx" type="text" size="40" label="Module Class Suffix" description="PARAMMODULECLASSSUFFIX" />
+		<param name="cache" type="list" default="1" label="Caching" description="Select whether to cache the content of this module">
+			<option value="1">Use global</option>
+			<option value="0">No caching</option>
+		</param>
+		<param name="cache_time" type="text" default="900" label="Cache Time" description="The time before the module is recached" />
+	</params>
+</install>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE install PUBLIC "-//Joomla! 1.5//DTD template 1.0//EN" "http://www.joomla.org/xml/dtd/1.5/template-install.dtd">
+<install version="1.5" type="template">
+	<name>Mustangg</name>
+	<creationDate>2 March 2012</creationDate>
+	<author>Avant Garde</author>
+	<authorEmail>joomla@run-digital.com</authorEmail>
+	<authorUrl>http://www.run-digital.com</authorUrl>
+	<copyright></copyright>
+	<license>GNU/GPL</license>
+	<version>1.0.0</version>
+	<description>For a website</description>
+	<files>
+		<filename>css/style.css</filename>
+		<filename>images/bg-strip.png</filename>
+		<filename>images/bottom-cover.png</filename>
+		<filename>images/bottom-img-hld.png</filename>
+		<filename>images/bottom-news.png</filename>
+		<filename>images/divider.png</filename>
+		<filename>images/g-img-1.png</filename>
+		<filename>images/g-img-2.png</filename>
+		<filename>images/g-img-3.png</filename>
+		<filename>images/img-seprtr.png</filename>
+		<filename>images/logo.png</filename>
+		<filename>images/sl-image.png</filename>
+		<filename>images/top-cont.png</filename>
+		<filename>images/top-news.png</filename>
+		<filename>images/top-strip.png</filename>
+		
+		<filename>index.html</filename>
+		<filename>index.php</filename>
+		<filename>javascript/md_stylechanger.js</filename>
+		<filename>javascript/index.html</filename>
+		<filename>params.ini</filename>
+		<filename>templateDetails.xml</filename>
+		<filename>template_thumbnail.png</filename>
+		<filename>favicon.ico</filename>
+		<filename>component.php</filename>
+	</files>
+	<languages>
+		<language tag="en-GB">en-GB.tpl_beez.ini</language>
+	</languages>
+	<administration>
+		<languages folder="admin">
+			<language tag="en-GB">en-GB.tpl_beez.ini</language>
+		</languages>
+	</administration>
+	<positions>
+		<position>right</position>
+		<position>user1</position>
+		<position>user2</position>
+		<position>topMenu</position>
+		<position>user3</position>
+		<position>user4</position>
+		<position>user5</position>
+		<position>user6</position>
+		<position>user7</position>
+		<position>copyrights</position>
+		<position>header_banner</position>		
+		<position>sidebar_links</position>
+		<position>gasandoil</position>
+	</positions>
+	<params>
+	</params>
+</install>
