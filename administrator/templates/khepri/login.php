@@ -49,7 +49,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	<div id="border-top" class="<?php echo $this->params->get('headerColor','green');?>">
 		<div>
 			<div>
-				<span class="title"><?php echo $this->params->get('showSiteName') ? $mainframe->getCfg( 'sitename' ) : JText::_('Administration'); ?></span>
+				<!-- <span class="title"><?php echo $this->params->get('showSiteName') ? $mainframe->getCfg( 'sitename' ) : JText::_('Administration'); ?></span> -->
 			</div>
 		</div>
 	</div>
@@ -63,7 +63,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				</div>
 				<div class="m">
 
-					<h1><?php echo JText::_('Joomla! Administration Login') ?></h1>
+					<h1><?php echo JText::_('Mustang Energy Services Admin Login') ?></h1>
 					<jdoc:include type="message" />
 					<jdoc:include type="component" />
 					<p><?php echo JText::_('DESCUSEVALIDLOGIN') ?></p>
@@ -89,9 +89,9 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 </div>
 <div id="footer">
 	<p class="copyright">
-		<a href="http://www.joomla.org" target="_blank">Joomla!</a>
-		<?php echo JText::_('ISFREESOFTWARE') ?>
-	</p>
+			Website by <a href="http://www.focusedidea.com" target="_blank">Focused Idea</a>
+			
+		</p>
 </div>
 </body>
 </html>

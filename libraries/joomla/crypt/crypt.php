@@ -1,14 +1,13 @@
 <?php
 /**
- * @version     $Id: crypt.php 22952 2012-03-27 00:40:16Z dextercowley $
  * @package     Joomla.Platform
  * @subpackage  Crypt
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2011 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
-defined('JPATH_BASE') or die();
+defined('JPATH_PLATFORM') or die;
 
 /**
  * JCrypt is a Joomla Platform class for handling basic encryption/decryption of data.
@@ -20,6 +19,102 @@ defined('JPATH_BASE') or die();
 class JCrypt
 {
 	/**
+	 * @var    JCryptCipher  The encryption cipher object.
+	 * @since  12.1
+	 */
+	private $_cipher;
+
+	/**
+	 * @var    JCryptKey  The encryption key[/pair)].
+	 * @since  12.1
+	 */
+	private $_key;
+
+	/**
+	 * Object Constructor takes an optional key to be used for encryption/decryption. If no key is given then the
+	 * secret word from the configuration object is used.
+	 *
+	 * @param   JCryptCipher  $cipher  The encryption cipher object.
+	 * @param   JCryptKey     $key     The encryption key[/pair)].
+	 *
+	 * @since   12.1
+	 */
+	public function __construct(JCryptCipher $cipher = null, JCryptKey $key = null)
+	{
+		// Set the encryption key[/pair)].
+		$this->_key = $key;
+
+		// Set the encryption cipher.
+		$this->_cipher = isset($cipher) ? $cipher : new JCryptCipherSimple;
+	}
+
+	/**
+	 * Method to decrypt a data string.
+	 *
+	 * @param   string  $data  The encrypted string to decrypt.
+	 *
+	 * @return  string  The decrypted data string.
+	 *
+	 * @since   12.1
+	 * @throws  InvalidArgumentException
+	 */
+	public function decrypt($data)
+	{
+		try
+		{
+			return $this->_cipher->decrypt($data, $this->_key);
+		}
+		catch (InvalidArgumentException $e)
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * Method to encrypt a data string.
+	 *
+	 * @param   string  $data  The data string to encrypt.
+	 *
+	 * @return  string  The encrypted data string.
+	 *
+	 * @since   12.1
+	 */
+	public function encrypt($data)
+	{
+		return $this->_cipher->encrypt($data, $this->_key);
+	}
+
+	/**
+	 * Method to generate a new encryption key[/pair] object.
+	 *
+	 * @param   array  $options  Key generation options.
+	 *
+	 * @return  JCryptKey
+	 *
+	 * @since   12.1
+	 */
+	public function generateKey(array $options = array())
+	{
+		return $this->_cipher->generateKey($options);
+	}
+
+	/**
+	 * Method to set the encryption key[/pair] object.
+	 *
+	 * @param   JCryptKey  $key  The key object to set.
+	 *
+	 * @return  JCrypt
+	 *
+	 * @since   12.1
+	 */
+	public function setKey(JCryptKey $key)
+	{
+		$this->_key = $key;
+
+		return $this;
+	}
+
+	/**
 	 * Generate random bytes.
 	 *
 	 * @param   integer  $length  Length of the random data to generate
@@ -27,23 +122,17 @@ class JCrypt
 	 * @return  string  Random binary data
 	 *
 	 * @since  12.1
-	 * @note   This method requires PHP 5
 	 */
-    function genRandomBytes($length = 16)
-    {
+	public static function genRandomBytes($length = 16)
+	{
+		$length = (int) $length;
 		$sslStr = '';
-		/*
-		 * if a secure randomness generator exists and we don't
-		 * have a buggy PHP version use it.
-		 */
-		if (
-			function_exists('openssl_random_pseudo_bytes')
-			&& (version_compare(PHP_VERSION, '5.3.4') >= 0
-				|| substr(PHP_OS, 0, 3) !== 'WIN'
-			)
-		)
+
+		// If a secure randomness generator exists use it.
+		if (function_exists('openssl_random_pseudo_bytes'))
 		{
 			$sslStr = openssl_random_pseudo_bytes($length, $strong);
+
 			if ($strong)
 			{
 				return $sslStr;
@@ -63,9 +152,12 @@ class JCrypt
 		// Check if we can use /dev/urandom.
 		$urandom = false;
 		$handle = null;
+
+		// This is PHP 5.3.3 and up
 		if (function_exists('stream_set_read_buffer') && @is_readable('/dev/urandom'))
 		{
 			$handle = @fopen('/dev/urandom', 'rb');
+
 			if ($handle)
 			{
 				$urandom = true;
@@ -76,14 +168,16 @@ class JCrypt
 		{
 			$bytes = ($total > $shaHashLength)? $shaHashLength : $total;
 			$total -= $bytes;
+
 			/*
 			 * Collect any entropy available from the PHP system and filesystem.
 			 * If we have ssl data that isn't strong, we use it once.
 			 */
 			$entropy = rand() . uniqid(mt_rand(), true) . $sslStr;
-			$entropy .= implode('', @fstat(fopen( __FILE__, 'r')));
+			$entropy .= implode('', @fstat(fopen(__FILE__, 'r')));
 			$entropy .= memory_get_usage();
 			$sslStr = '';
+
 			if ($urandom)
 			{
 				stream_set_read_buffer($handle, 0);
@@ -100,42 +194,52 @@ class JCrypt
 				 */
 				$samples = 3;
 				$duration = 0;
+
 				for ($pass = 0; $pass < $samples; ++$pass)
 				{
 					$microStart = microtime(true) * 1000000;
 					$hash = sha1(mt_rand(), true);
+
 					for ($count = 0; $count < 50; ++$count)
 					{
 						$hash = sha1($hash, true);
 					}
+
 					$microEnd = microtime(true) * 1000000;
 					$entropy .= $microStart . $microEnd;
-					if ($microStart > $microEnd) {
+
+					if ($microStart >= $microEnd)
+					{
 						$microEnd += 1000000;
 					}
+
 					$duration += $microEnd - $microStart;
 				}
+
 				$duration = $duration / $samples;
 
 				/*
 				 * Based on the average time, determine the total rounds so that
 				 * the total running time is bounded to a reasonable number.
 				 */
-				$rounds = (int)(($maxTimeMicro / $duration) * 50);
+				$rounds = (int) (($maxTimeMicro / $duration) * 50);
 
 				/*
 				 * Take additional measurements. On average we can expect
 				 * at least $bitsPerRound bits of entropy from each measurement.
 				 */
 				$iter = $bytes * (int) ceil(8 / $bitsPerRound);
+
 				for ($pass = 0; $pass < $iter; ++$pass)
 				{
 					$microStart = microtime(true);
 					$hash = sha1(mt_rand(), true);
+
 					for ($count = 0; $count < $rounds; ++$count)
 					{
 						$hash = sha1($hash, true);
 					}
+
 					$entropy .= $microStart . microtime(true);
 				}
 			}
@@ -149,5 +253,64 @@ class JCrypt
 		}
 
 		return substr($randomStr, 0, $length);
+	}
+
+	/**
+	 * A timing safe comparison method. This defeats hacking
+	 * attempts that use timing based attack vectors.
+	 *
+	 * @param   string  $known    A known string to check against.
+	 * @param   string  $unknown  An unknown string to check.
+	 *
+	 * @return  boolean  True if the two strings are exactly the same.
+	 *
+	 * @since   3.2
+	 */
+	public static function timingSafeCompare($known, $unknown)
+	{
+		// Prevent issues if string length is 0
+		$known .= chr(0);
+		$unknown .= chr(0);
+
+		$knownLength = strlen($known);
+		$unknownLength = strlen($unknown);
+
+		// Set the result to the difference between the lengths
+		$result = $knownLength - $unknownLength;
+
+		// Note that we ALWAYS iterate over the user-supplied length to prevent leaking length info.
+		for ($i = 0; $i < $unknownLength; $i++)
+		{
+			// Using % here is a trick to prevent notices. It's safe, since if the lengths are different, $result is already non-0
+			$result |= (ord($known[$i % $knownLength]) ^ ord($unknown[$i]));
+		}
+
+		// They are only identical strings if $result is exactly 0...
+		return $result === 0;
+	}
+
+	/**
+	 * Tests for the availability of updated crypt().
+	 * Based on a method by Anthony Ferrera
+	 *
+	 * @return  boolean  Always returns true since 3.3
+	 *
+	 * @note    To be removed when PHP 5.3.7 or higher is the minimum supported version.
+	 * @see     https://github.com/ircmaxell/password_compat/blob/master/version-test.php
+	 * @since   3.2
+	 * @deprecated  4.0
+	 */
+	public static function hasStrongPasswordSupport()
+	{
+		// Log usage of deprecated function
+		JLog::add(__METHOD__ . '() is deprecated without replacement.', JLog::WARNING, 'deprecated');
+
+		if (!defined('PASSWORD_DEFAULT'))
+		{
+			// Always make sure that the password hashing API has been defined.
+			include_once JPATH_ROOT . '/libraries/compat/password/lib/password.php';
+		}
+
+		return true;
 	}
 }

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install type="component" version="1.5.0" method="upgrade">
+	<name>Zt Autolink</name>
+	<creationDate>2011-07-01</creationDate>
+	<author>ZooTemplate</author>
+	<authorEmail>support@ZooTemplate.com</authorEmail>
+	<authorUrl>www.ZooTemplate.com</authorUrl>
+	<copyright>Copyright Info</copyright>
+	<license>License Info</license>
+	<version>1.0.0</version>
+	<description></description>
+	
+	<installfile>install.autolink.php</installfile>
+	<uninstallfile>uninstall.autolink.php</uninstallfile>
+	
+	<!-- Site Main File Copy Section -->
+	<files folder="site">
+		<filename>controller.php</filename>
+		<filename>ztautolink.php</filename>
+		<filename>index.html</filename>
+		<filename>views/ztautolink/index.html</filename>
+		<filename>views/ztautolink/view.html.php</filename>
+		<filename>views/ztautolink/tmpl/index.html</filename>
+		<filename>views/ztautolink/tmpl/default.php</filename>
+		<filename>views/index.html</filename>
+	</files>
+
+	<install>
+		<sql>
+			<file charset="utf8" driver="mysql">install.sql</file>
+		</sql>
+	</install>
+	<uninstall>
+		<sql>
+			<file charset="utf8" driver="mysql">uninstall.sql</file>
+		</sql>
+	</uninstall>	
+
+	<administration>
+		<!-- Administration Menu Section -->
+		<menu>Zt Autolink</menu>
+		
+		<!-- Administration Main File Copy Section -->
+		<files folder="admin">
+			<!-- Site Main File Copy Section -->
+			<filename>ztautolink.php</filename>
+			<filename>index.html</filename>
+			<filename>install.sql</filename>
+			<filename>uninstall.sql</filename>
+			<filename>controller.php</filename>
+			
+			<folder>classes</folder>
+			<folder>controllers</folder>
+			<folder>models</folder>
+			<folder>tables</folder>
+			<folder>views</folder>
+			<folder>install</folder>
+			<folder>export</folder>
+			
+		</files>		
+	</administration>
+	<plugins>
+		<plugin plugin="zt_autolink_system" group="system" />
+	</plugins>
+</install>

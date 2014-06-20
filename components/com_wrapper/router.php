@@ -1,40 +1,94 @@
 <?php
 /**
- * @version		$Id: router.php 9764 2007-12-30 07:48:11Z ircmaxell $
- * @package		Joomla
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
- * @license		GNU/GPL, see LICENSE.php
- * Joomla! is free software. This version may have been modified pursuant
- * to the GNU General Public License, and as distributed it includes or
- * is derivative of works licensed under the GNU General Public License or
- * other free or open source software licenses.
- * See COPYRIGHT.php for copyright notices and details.
+ * @package     Joomla.Site
+ * @subpackage  com_wrapper
+ *
+ * @copyright   Copyright (C) 2005 - 2014 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
+
+defined('_JEXEC') or die;
 
 /**
- * @param	array
- * @return	array
+ * Routing class from com_wrapper
+ *
+ * @package     Joomla.Site
+ * @subpackage  com_wrapper
+ * @since       3.3
  */
-function WrapperBuildRoute( &$query )
+class WrapperRouter extends JComponentRouterBase
 {
-	$segments = array();
+	/**
+	 * Build the route for the com_wrapper component
+	 *
+	 * @param   array  &$query  An array of URL arguments
+	 *
+	 * @return  array  The URL arguments to use to assemble the subsequent URL.
+	 *
+	 * @since   3.3
+	 */
+	public function build(&$query)
+	{
+		$segments = array();
 
-	if (isset($query['view'])) {
-		unset($query['view']);
+		if (isset($query['view']))
+		{
+			unset($query['view']);
+		}
+
+		$total = count($segments);
+
+		for ($i = 0; $i < $total; $i++)
+		{
+			$segments[$i] = str_replace(':', '-', $segments[$i]);
+		}
+
+		return $segments;
 	}
 
-	return $segments;
+	/**
+	 * Parse the segments of a URL.
+	 *
+	 * @param   array  &$segments  The segments of the URL to parse.
+	 *
+	 * @return  array  The URL attributes to be used by the application.
+	 *
+	 * @since   3.3
+	 */
+	public function parse(&$segments)
+	{
+		$total = count($segments);
+		$vars = array();
+
+		for ($i = 0; $i < $total; $i++)
+		{
+			$segments[$i] = preg_replace('/-/', ':', $segments[$i], 1);
+		}
+
+		$vars['view'] = 'wrapper';
+
+		return $vars;
+	}
 }
 
 /**
- * @param	array
- * @return	array
+ * Wrapper router functions
+ *
+ * These functions are proxys for the new router interface
+ * for old SEF extensions.
+ *
+ * @deprecated  4.0  Use Class based routers instead
  */
-function WrapperParseRoute( $segments )
+function WrapperBuildRoute(&$query)
 {
-	$vars = array();
+	$router = new WrapperRouter;
 
-	$vars['view'] = 'wrapper';
+	return $router->build($query);
+}
 
-	return $vars;
+function WrapperParseRoute($segments)
+{
+	$router = new WrapperRouter;
+
+	return $router->parse($segments);
 }

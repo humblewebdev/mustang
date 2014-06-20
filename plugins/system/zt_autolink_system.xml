@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<install version="1.5" type="plugin" group="system" method="upgrade">
+   <name>ZT Autolink Sytem 1.5</name>
+   <author>ZooTemplate</author>
+   <creationDate>August 2011</creationDate>
+   <copyright>Copyright (C) 2008 - 2011 http://www.ZooTemplate.com. All rights reserved.</copyright>
+   <license>GPL/GNU</license>
+   <authorEmail>support@ZooTemplate.com</authorEmail>
+   <authorUrl>www.ZooTemplate.com</authorUrl>
+   <version>1.5.0</version>
+   <description>ZT Autolink Sytem Version 1.5</description>
+   <files>
+       <filename plugin="zt_autolink_system">zt_autolink_system.php</filename>
+	   <folder> </folder>
+   </files>
+   <params> 
+		<param name="confirm_popup" type="radio" default="0" label="Confirm popup for redirect links" description="Display confirm-popup before redirect or not?">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="confirm_popup_text" type="textarea" default="" label="Confirm popup text" description="The content of confirm popup. Please do not use apostrophe (')!" rows="10" cols="40" />		
+   </params>
+</install>

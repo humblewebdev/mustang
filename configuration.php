@@ -1,70 +1,58 @@
 <?php
 class JConfig {
-/* Site Settings */
-var $offline = '0';
-var $offline_message = 'This site is down for maintenance.<br /> Please check back again soon.';
-var $sitename = 'Mustang Energy Services';
-var $editor = 'tinymce';
-var $list_limit = '20';
-var $legacy = '0';
-/* Debug Settings */
-var $debug = '0';
-var $debug_lang = '0';
-/* Database Settings */
-var $dbtype = 'mysql';
-var $host = 'localhost';
-var $user = 'root';
-var $password = 'root';
-var $db = 'Mustang_database';
-var $dbprefix = 'jos_';
-/* Server Settings */
-var $live_site = '';
-var $secret = 'K04dFYB2zMaUUVLk';
-var $gzip = '0';
-var $error_reporting = '-1';
-var $helpurl = 'http://help.joomla.org';
-var $xmlrpc_server = '0';
-var $ftp_host = '127.0.0.1';
-var $ftp_port = '21';
-var $ftp_user = '';
-var $ftp_pass = '';
-var $ftp_root = '';
-var $ftp_enable = '0';
-var $force_ssl = '0';
-/* Locale Settings */
-var $offset = '0';
-var $offset_user = '0';
-/* Mail Settings */
-var $mailer = 'mail';
-var $mailfrom = 'tom@typhondesigns.com';
-var $fromname = 'Mustang Energy Services';
-var $sendmail = '/usr/sbin/sendmail';
-var $smtpauth = '0';
-var $smtpsecure = 'none';
-var $smtpport = '25';
-var $smtpuser = '';
-var $smtppass = '';
-var $smtphost = 'localhost';
-/* Cache Settings */
-var $caching = '0';
-var $cachetime = '15';
-var $cache_handler = 'file';
-/* Meta Settings */
-var $MetaDesc = 'Joomla! - the dynamic portal engine and content management system';
-var $MetaKeys = 'joomla, Joomla';
-var $MetaTitle = '1';
-var $MetaAuthor = '1';
-/* SEO Settings */
-var $sef           = '0';
-var $sef_rewrite   = '0';
-var $sef_suffix    = '0';
-/* Feed Settings */
-var $feed_limit   = 10;
-var $feed_email   = 'author';
-var $log_path = '/Applications/MAMP/Mustang/logs';
-var $tmp_path = '/Applications/MAMP/Mustang/tmp';
-/* Session Setting */
-var $lifetime = '15';
-var $session_handler = 'database';
+	var $offline = '0';
+	var $editor = 'tinymce';
+	var $list_limit = '20';
+	var $helpurl = 'http://help.joomla.org';
+	var $debug = '0';
+	var $debug_lang = '0';
+	var $sef = '1';
+	var $sef_rewrite = '1';
+	var $sef_suffix = '0';
+	var $feed_limit = '10';
+	var $feed_email = 'author';
+	var $secret = 'OiNnYZgxgYuCMZFX';
+	var $gzip = '0';
+	var $error_reporting = '-1';
+	var $xmlrpc_server = '0';
+	var $log_path = '/home/mustang2013/public_html/logs';
+	var $tmp_path = '/home/mustang2013/public_html/tmp';
+	var $live_site = '';
+	var $force_ssl = '0';
+	var $offset = '0';
+	var $caching = '0';
+	var $cachetime = '15';
+	var $cache_handler = 'file';
+	var $memcache_settings = array();
+	var $ftp_enable = '0';
+	var $ftp_host = '127.0.0.1';
+	var $ftp_port = '21';
+	var $ftp_user = '';
+	var $ftp_pass = '';
+	var $ftp_root = '';
+	var $dbtype = 'mysql';
+	var $host = 'localhost';
+    var $user = 'root';
+    var $password = 'root';
+	var $db = 'Mustang_database';
+	var $dbprefix = 'jos_';
+	var $mailer = 'mail';
+	var $mailfrom = 'admin@mustangenergyservices.com';
+	var $fromname = 'Mustang';
+	var $sendmail = '/usr/sbin/sendmail';
+	var $smtpauth = '0';
+	var $smtpsecure = 'none';
+	var $smtpport = '25';
+	var $smtpuser = '';
+	var $smtppass = '';
+	var $smtphost = 'localhost';
+	var $MetaAuthor = '1';
+	var $MetaTitle = '1';
+	var $lifetime = '15';
+	var $session_handler = 'database';
+	var $sitename = 'Mustang Energy Services';
+	var $MetaDesc = 'Mustang Energy Services, Inc is an oil and gas/energy services company specializing in pit lining in the south texas/ Eagle Ford Shell area.';
+	var $MetaKeys = 'Pit liner,Frac Pit,Containment,Oilfield Services,South Texas,Reserve Pit,Energy Services';
+	var $offline_message = 'This site is down for maintenance. Please check back again soon.';
 }
 ?>

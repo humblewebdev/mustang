@@ -1,88 +1,40 @@
 <?php
 /**
-* @version		$Id: index.php 14401 2010-01-26 14:10:00Z louis $
-* @package		Joomla
-* @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
-* @license		GNU/GPL, see LICENSE.php
-* Joomla! is free software. This version may have been modified pursuant
-* to the GNU General Public License, and as distributed it includes or
-* is derivative of works licensed under the GNU General Public License or
-* other free or open source software licenses.
-* See COPYRIGHT.php for copyright notices and details.
-*/
-
-// Set flag that this is a parent file
-define( '_JEXEC', 1 );
-
-define('JPATH_BASE', dirname(__FILE__) );
-
-define( 'DS', DIRECTORY_SEPARATOR );
-
-require_once ( JPATH_BASE .DS.'includes'.DS.'defines.php' );
-require_once ( JPATH_BASE .DS.'includes'.DS.'framework.php' );
-
-JDEBUG ? $_PROFILER->mark( 'afterLoad' ) : null;
-
-/**
- * CREATE THE APPLICATION
+ * @package    Joomla.Site
  *
- * NOTE :
+ * @copyright  Copyright (C) 2005 - 2014 Open Source Matters, Inc. All rights reserved.
+ * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
-$mainframe =& JFactory::getApplication('site');
+
+if (version_compare(PHP_VERSION, '5.3.10', '<'))
+{
+	die('Your host needs to use PHP 5.3.10 or higher to run this version of Joomla!');
+}
 
 /**
- * INITIALISE THE APPLICATION
- *
- * NOTE :
+ * Constant that is checked in included files to prevent direct access.
+ * define() is used in the installation folder rather than "const" to not error for PHP 5.2 and lower
  */
-// set the language
-$mainframe->initialise();
+define('_JEXEC', 1);
 
-JPluginHelper::importPlugin('system');
+if (file_exists(__DIR__ . '/defines.php'))
+{
+	include_once __DIR__ . '/defines.php';
+}
 
-// trigger the onAfterInitialise events
-JDEBUG ? $_PROFILER->mark('afterInitialise') : null;
-$mainframe->triggerEvent('onAfterInitialise');
+if (!defined('_JDEFINES'))
+{
+	define('JPATH_BASE', __DIR__);
+	require_once JPATH_BASE . '/includes/defines.php';
+}
 
-/**
- * ROUTE THE APPLICATION
- *
- * NOTE :
- */
-$mainframe->route();
+require_once JPATH_BASE . '/includes/framework.php';
 
-// authorization
-$Itemid = JRequest::getInt( 'Itemid');
-$mainframe->authorize($Itemid);
+// Mark afterLoad in the profiler.
+JDEBUG ? $_PROFILER->mark('afterLoad') : null;
 
-// trigger the onAfterRoute events
-JDEBUG ? $_PROFILER->mark('afterRoute') : null;
-$mainframe->triggerEvent('onAfterRoute');
+// Instantiate the application.
+$app = JFactory::getApplication('site');
 
-/**
- * DISPATCH THE APPLICATION
- *
- * NOTE :
- */
-$option = JRequest::getCmd('option');
-$mainframe->dispatch($option);
-
-// trigger the onAfterDispatch events
-JDEBUG ? $_PROFILER->mark('afterDispatch') : null;
-$mainframe->triggerEvent('onAfterDispatch');
-
-/**
- * RENDER  THE APPLICATION
- *
- * NOTE :
- */
-$mainframe->render();
-
-// trigger the onAfterRender events
-JDEBUG ? $_PROFILER->mark('afterRender') : null;
-$mainframe->triggerEvent('onAfterRender');
-
-/**
- * RETURN THE RESPONSE
- */
-echo JResponse::toString($mainframe->getCfg('gzip'));
+// Execute the application.
+$app->execute();

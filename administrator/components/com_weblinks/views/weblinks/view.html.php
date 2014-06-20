@@ -1,82 +1,164 @@
 <?php
 /**
-* @version		$Id: view.html.php 19343 2010-11-03 18:12:02Z ian $
-* @package		Joomla
-* @subpackage	Weblinks
-* @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
-* @license		GNU/GPL, see LICENSE.php
-* Joomla! is free software. This version may have been modified pursuant
-* to the GNU General Public License, and as distributed it includes or
-* is derivative of works licensed under the GNU General Public License or
-* other free or open source software licenses.
-* See COPYRIGHT.php for copyright notices and details.
-*/
+ * @package     Joomla.Administrator
+ * @subpackage  com_weblinks
+ *
+ * @copyright   Copyright (C) 2005 - 2014 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
 
-// Check to ensure this file is included in Joomla!
-defined('_JEXEC') or die( 'Restricted access' );
-
-jimport( 'joomla.application.component.view');
+defined('_JEXEC') or die;
 
 /**
- * HTML View class for the WebLinks component
+ * View class for a list of weblinks.
  *
- * @static
- * @package		Joomla
- * @subpackage	Weblinks
- * @since 1.0
+ * @package     Joomla.Administrator
+ * @subpackage  com_weblinks
+ * @since       1.5
  */
-class WeblinksViewWeblinks extends JView
+class WeblinksViewWeblinks extends JViewLegacy
 {
-	function display($tpl = null)
+	protected $items;
+
+	protected $pagination;
+
+	protected $state;
+
+	/**
+	 * Display the view
+	 *
+	 * @return  void
+	 */
+	public function display($tpl = null)
 	{
-		global $mainframe, $option;
+		$this->state		= $this->get('State');
+		$this->items		= $this->get('Items');
+		$this->pagination	= $this->get('Pagination');
 
-		$db		=& JFactory::getDBO();
-		$uri	=& JFactory::getURI();
+		WeblinksHelper::addSubmenu('weblinks');
 
-		$filter_state		= $mainframe->getUserStateFromRequest( $option.'filter_state',		'filter_state',		'',				'word' );
-		$filter_catid		= $mainframe->getUserStateFromRequest( $option.'filter_catid',		'filter_catid',		0,				'int' );
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'filter_order',		'filter_order',		'a.ordering',	'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'filter_order_Dir',	'filter_order_Dir',	'',				'word' );
-		$search				= $mainframe->getUserStateFromRequest( $option.'search',			'search',			'',				'string' );
-		if (strpos($search, '"') !== false) {
-			$search = str_replace(array('=', '<'), '', $search);
-		}
-		$search = JString::strtolower($search);
-
-		// sanitize $filter_order
-		if (!in_array($filter_order, array('a.title', 'a.published', 'a.ordering', 'category', 'a.hits', 'a.id'))) {
-			$filter_order = 'a.ordering';
+		// Check for errors.
+		if (count($errors = $this->get('Errors')))
+		{
+			JError::raiseError(500, implode("\n", $errors));
+			return false;
 		}
 
-		if (!in_array(strtoupper($filter_order_Dir), array('ASC', 'DESC'))) {
-			$filter_order_Dir = '';
-		}
-
-		// Get data from the model
-		$items		= & $this->get( 'Data');
-		$total		= & $this->get( 'Total');
-		$pagination = & $this->get( 'Pagination' );
-
-		// build list of categories
-		$javascript 	= 'onchange="document.adminForm.submit();"';
-		$lists['catid'] = JHTML::_('list.category',  'filter_catid', $option, intval( $filter_catid ), $javascript );
-
-		// state filter
-		$lists['state']	= JHTML::_('grid.state',  $filter_state );
-
-		// table ordering
-		$lists['order_Dir'] = $filter_order_Dir;
-		$lists['order'] = $filter_order;
-
-		// search filter
-		$lists['search']= $search;
-
-		$this->assignRef('user',		JFactory::getUser());
-		$this->assignRef('lists',		$lists);
-		$this->assignRef('items',		$items);
-		$this->assignRef('pagination',	$pagination);
-
+		$this->addToolbar();
+		$this->sidebar = JHtmlSidebar::render();
 		parent::display($tpl);
+	}
+
+	/**
+	 * Add the page title and toolbar.
+	 *
+	 * @since   1.6
+	 */
+	protected function addToolbar()
+	{
+		require_once JPATH_COMPONENT . '/helpers/weblinks.php';
+
+		$state	= $this->get('State');
+		$canDo	= JHelperContent::getActions('com_weblinks', 'category', $state->get('filter.category_id'));
+		$user	= JFactory::getUser();
+
+		// Get the toolbar object instance
+		$bar = JToolBar::getInstance('toolbar');
+
+		JToolbarHelper::title(JText::_('COM_WEBLINKS_MANAGER_WEBLINKS'), 'link weblinks');
+		if (count($user->getAuthorisedCategories('com_weblinks', 'core.create')) > 0)
+		{
+			JToolbarHelper::addNew('weblink.add');
+		}
+		if ($canDo->get('core.edit'))
+		{
+			JToolbarHelper::editList('weblink.edit');
+		}
+		if ($canDo->get('core.edit.state')) {
+
+			JToolbarHelper::publish('weblinks.publish', 'JTOOLBAR_PUBLISH', true);
+			JToolbarHelper::unpublish('weblinks.unpublish', 'JTOOLBAR_UNPUBLISH', true);
+
+			JToolbarHelper::archiveList('weblinks.archive');
+			JToolbarHelper::checkin('weblinks.checkin');
+		}
+		if ($state->get('filter.state') == -2 && $canDo->get('core.delete'))
+		{
+			JToolbarHelper::deleteList('', 'weblinks.delete', 'JTOOLBAR_EMPTY_TRASH');
+		} elseif ($canDo->get('core.edit.state'))
+		{
+			JToolbarHelper::trash('weblinks.trash');
+		}
+		// Add a batch button
+		if ($user->authorise('core.create', 'com_weblinks') && $user->authorise('core.edit', 'com_weblinks') && $user->authorise('core.edit.state', 'com_weblinks'))
+		{
+			JHtml::_('bootstrap.modal', 'collapseModal');
+			$title = JText::_('JTOOLBAR_BATCH');
+
+			// Instantiate a new JLayoutFile instance and render the batch button
+			$layout = new JLayoutFile('joomla.toolbar.batch');
+
+			$dhtml = $layout->render(array('title' => $title));
+			$bar->appendButton('Custom', $dhtml, 'batch');
+		}
+		if ($user->authorise('core.admin', 'com_weblinks'))
+		{
+			JToolbarHelper::preferences('com_weblinks');
+		}
+
+		JToolbarHelper::help('JHELP_COMPONENTS_WEBLINKS_LINKS');
+
+		JHtmlSidebar::setAction('index.php?option=com_weblinks&view=weblinks');
+
+		JHtmlSidebar::addFilter(
+			JText::_('JOPTION_SELECT_PUBLISHED'),
+			'filter_state',
+			JHtml::_('select.options', JHtml::_('jgrid.publishedOptions'), 'value', 'text', $this->state->get('filter.state'), true)
+		);
+
+		JHtmlSidebar::addFilter(
+			JText::_('JOPTION_SELECT_CATEGORY'),
+			'filter_category_id',
+			JHtml::_('select.options', JHtml::_('category.options', 'com_weblinks'), 'value', 'text', $this->state->get('filter.category_id'))
+		);
+
+		JHtmlSidebar::addFilter(
+			JText::_('JOPTION_SELECT_ACCESS'),
+			'filter_access',
+			JHtml::_('select.options', JHtml::_('access.assetgroups'), 'value', 'text', $this->state->get('filter.access'))
+		);
+
+		JHtmlSidebar::addFilter(
+			JText::_('JOPTION_SELECT_LANGUAGE'),
+			'filter_language',
+			JHtml::_('select.options', JHtml::_('contentlanguage.existing', true, true), 'value', 'text', $this->state->get('filter.language'))
+		);
+
+		JHtmlSidebar::addFilter(
+		JText::_('JOPTION_SELECT_TAG'),
+		'filter_tag',
+		JHtml::_('select.options', JHtml::_('tag.options', true, true), 'value', 'text', $this->state->get('filter.tag'))
+		);
+
+	}
+
+	/**
+	 * Returns an array of fields the table can be sorted by
+	 *
+	 * @return  array  Array containing the field name to sort by as the key and display text as value
+	 *
+	 * @since   3.0
+	 */
+	protected function getSortFields()
+	{
+		return array(
+			'a.ordering' => JText::_('JGRID_HEADING_ORDERING'),
+			'a.state' => JText::_('JSTATUS'),
+			'a.title' => JText::_('JGLOBAL_TITLE'),
+			'a.access' => JText::_('JGRID_HEADING_ACCESS'),
+			'a.hits' => JText::_('JGLOBAL_HITS'),
+			'a.language' => JText::_('JGRID_HEADING_LANGUAGE'),
+			'a.id' => JText::_('JGRID_HEADING_ID')
+		);
 	}
 }

@@ -1,26 +1,38 @@
-<?php defined('_JEXEC') or die('Restricted access'); ?>
-<form action="index.php?option=com_media&amp;tmpl=component&amp;folder=<?php echo $this->state->folder; ?>" method="post" id="mediamanager-form" name="mediamanager-form">
-	<div class="manager">
-		<?php echo $this->loadTemplate('up'); ?>
+<?php
+/**
+ * @package     Joomla.Administrator
+ * @subpackage  com_media
+ *
+ * @copyright   Copyright (C) 2005 - 2014 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
 
-		<?php for ($i=0,$n=count($this->folders); $i<$n; $i++) :
+defined('_JEXEC') or die;
+?>
+<form target="_parent" action="index.php?option=com_media&amp;tmpl=index&amp;folder=<?php echo $this->state->folder; ?>" method="post" id="mediamanager-form" name="mediamanager-form">
+	<ul class="manager thumbnails">
+		<?php
+		echo $this->loadTemplate('up');
+		?>
+
+		<?php for ($i = 0, $n = count($this->folders); $i < $n; $i++) :
 			$this->setFolder($i);
 			echo $this->loadTemplate('folder');
 		endfor; ?>
 
-		<?php for ($i=0,$n=count($this->documents); $i<$n; $i++) :
+		<?php for ($i = 0, $n = count($this->documents); $i < $n; $i++) :
 			$this->setDoc($i);
 			echo $this->loadTemplate('doc');
 		endfor; ?>
 
-		<?php for ($i=0,$n=count($this->images); $i<$n; $i++) :
+		<?php for ($i = 0, $n = count($this->images); $i < $n; $i++) :
 			$this->setImage($i);
 			echo $this->loadTemplate('img');
 		endfor; ?>
 
-	</div>
-	<input type="hidden" name="task" value="" />
-	<input type="hidden" name="username" value="" />
-	<input type="hidden" name="password" value="" />
-	<?php echo JHTML::_( 'form.token' ); ?>
+		<input type="hidden" name="task" value="" />
+		<input type="hidden" name="username" value="" />
+		<input type="hidden" name="password" value="" />
+		<?php echo JHtml::_('form.token'); ?>
+	</ul>
 </form>

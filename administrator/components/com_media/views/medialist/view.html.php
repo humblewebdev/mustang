@@ -1,89 +1,106 @@
 <?php
 /**
-* @version		$Id: view.html.php 14401 2010-01-26 14:10:00Z louis $
-* @package		Joomla
-* @subpackage	Media
-* @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
-* @license		GNU/GPL, see LICENSE.php
-* Joomla! is free software. This version may have been modified pursuant
-* to the GNU General Public License, and as distributed it includes or
-* is derivative of works licensed under the GNU General Public License or
-* other free or open source software licenses.
-* See COPYRIGHT.php for copyright notices and details.
-*/
+ * @package     Joomla.Administrator
+ * @subpackage  com_media
+ *
+ * @copyright   Copyright (C) 2005 - 2014 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
 
-// Check to ensure this file is included in Joomla!
-defined('_JEXEC') or die( 'Restricted access' );
-
-jimport( 'joomla.application.component.view');
+defined('_JEXEC') or die;
 
 /**
  * HTML View class for the Media component
  *
- * @static
- * @package		Joomla
- * @subpackage	Media
- * @since 1.0
+ * @package     Joomla.Administrator
+ * @subpackage  com_media
+ * @since       1.0
  */
-class MediaViewMediaList extends JView
+class MediaViewMediaList extends JViewLegacy
 {
-	function display($tpl = null)
+	public function display($tpl = null)
 	{
-		global $mainframe;
+		$app = JFactory::getApplication();
+
+		if (!$app->isAdmin())
+		{
+			return $app->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'warning');
+		}
 
 		// Do not allow cache
-		JResponse::allowCache(false);
+		$app->allowCache(false);
 
-		$style = $mainframe->getUserStateFromRequest('media.list.layout', 'layout', 'thumbs', 'word');
+		JHtml::_('behavior.framework', true);
 
-		JHTML::_('behavior.mootools');
-
-		$document = &JFactory::getDocument();
-		$document->addStyleSheet('components/com_media/assets/medialist-'.$style.'.css');
-
-		$document->addScriptDeclaration("
-		window.addEvent('domready', function() {
-			window.top.document.updateUploader && window.top.document.updateUploader();
-			$$('a.img-preview').each(function(el) {
-				el.addEvent('click', function(e) {
-					new Event(e).stop();
+		JFactory::getDocument()->addScriptDeclaration("
+		window.addEvent('domready', function()
+		{
+			window.parent.document.updateUploader();
+			$$('a.img-preview').each(function(el)
+			{
+				el.addEvent('click', function(e)
+				{
 					window.top.document.preview.fromElement(el);
+					return false;
 				});
 			});
 		});");
 
-		$this->assign('baseURL', JURI::root());
-		$this->assignRef('images', $this->get('images'));
-		$this->assignRef('documents', $this->get('documents'));
-		$this->assignRef('folders', $this->get('folders'));
-		$this->assignRef('state', $this->get('state'));
+		$images = $this->get('images');
+		$documents = $this->get('documents');
+		$folders = $this->get('folders');
+		$state = $this->get('state');
+
+		// Check for invalid folder name
+		if (empty($state->folder)) {
+			$dirname = JRequest::getVar('folder', '', '', 'string');
+			if (!empty($dirname)) {
+				$dirname = htmlspecialchars($dirname, ENT_COMPAT, 'UTF-8');
+				JError::raiseWarning(100, JText::sprintf('COM_MEDIA_ERROR_UNABLE_TO_BROWSE_FOLDER_WARNDIRNAME', $dirname));
+			}
+		}
+
+		$this->baseURL = JUri::root();
+		$this->images = &$images;
+		$this->documents = &$documents;
+		$this->folders = &$folders;
+		$this->state = &$state;
 
 		parent::display($tpl);
 	}
 
 	function setFolder($index = 0)
 	{
-		if (isset($this->folders[$index])) {
+		if (isset($this->folders[$index]))
+		{
 			$this->_tmp_folder = &$this->folders[$index];
-		} else {
+		}
+		else
+		{
 			$this->_tmp_folder = new JObject;
 		}
 	}
 
 	function setImage($index = 0)
 	{
-		if (isset($this->images[$index])) {
+		if (isset($this->images[$index]))
+		{
 			$this->_tmp_img = &$this->images[$index];
-		} else {
+		}
+		else
+		{
 			$this->_tmp_img = new JObject;
 		}
 	}
 
 	function setDoc($index = 0)
 	{
-		if (isset($this->documents[$index])) {
+		if (isset($this->documents[$index]))
+		{
 			$this->_tmp_doc = &$this->documents[$index];
-		} else {
+		}
+		else
+		{
 			$this->_tmp_doc = new JObject;
 		}
 	}

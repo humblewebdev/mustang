@@ -1,131 +1,189 @@
 <?php
 /**
- * @version		$Id: newsfeed.php 14401 2010-01-26 14:10:00Z louis $
- * @package		Joomla
- * @subpackage	Content
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
- * @license		GNU/GPL, see LICENSE.php
- * Joomla! is free software. This version may have been modified pursuant to the
- * GNU General Public License, and as distributed it includes or is derivative
- * of works licensed under the GNU General Public License or other free or open
- * source software licenses. See COPYRIGHT.php for copyright notices and
- * details.
+ * @package     Joomla.Site
+ * @subpackage  com_newsfeeds
+ *
+ * @copyright   Copyright (C) 2005 - 2014 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// Check to ensure this file is included in Joomla!
-defined('_JEXEC') or die( 'Restricted access' );
-
-jimport('joomla.application.component.model');
+defined('_JEXEC') or die;
 
 /**
  * Newsfeeds Component Newsfeed Model
  *
- * @package		Joomla
- * @subpackage	Newsfeeds
- * @since 1.5
+ * @package     Joomla.Site
+ * @subpackage  com_newsfeeds
+ * @since       1.5
  */
-class NewsfeedsModelNewsfeed extends JModel
+class NewsfeedsModelNewsfeed extends JModelItem
 {
 	/**
-	 * Newsfeed id
+	 * Model context string.
 	 *
-	 * @var int
+	 * @var		string
+	 * @since   1.6
 	 */
-	var $_id = null;
+	protected $_context = 'com_newsfeeds.newsfeed';
 
 	/**
-	 * Newsfeed data
+	 * Method to auto-populate the model state.
 	 *
-	 * @var array
-	 */
-	var $_data = null;
-
-	/**
-	 * Constructor
+	 * Note. Calling getState in this method will result in recursion.
 	 *
-	 * @since 1.5
+	 * @return  void
+	 * @since   1.6
 	 */
-	function __construct()
+	protected function populateState()
 	{
-		parent::__construct();
+		$app = JFactory::getApplication('site');
 
-		$id = JRequest::getVar('id', 0, '', 'int');
-		$this->setId((int)$id);
+		// Load state from the request.
+		$pk = $app->input->getInt('id');
+		$this->setState('newsfeed.id', $pk);
+
+		$offset = $app->input->get('limitstart', 0, 'uint');
+		$this->setState('list.offset', $offset);
+
+		// Load the parameters.
+		$params = $app->getParams();
+		$this->setState('params', $params);
+
+		$user = JFactory::getUser();
+		if ((!$user->authorise('core.edit.state', 'com_newsfeeds')) &&  (!$user->authorise('core.edit', 'com_newsfeeds'))){
+			$this->setState('filter.published', 1);
+			$this->setState('filter.archived', 2);
+		}
 	}
 
 	/**
-	 * Method to set the newsfeed identifier
+	 * Method to get newsfeed data.
 	 *
-	 * @access	public
-	 * @param	int Newsfeed identifier
+	 * @param   integer	The id of the newsfeed.
+	 *
+	 * @return  mixed  Menu item data object on success, false on failure.
+	 * @since   1.6
 	 */
-	function setId($id)
+	public function &getItem($pk = null)
 	{
-		// Set weblink id and wipe data
-		$this->_id	 = $id;
-		$this->_data = null;
-	}
+		$pk = (!empty($pk)) ? $pk : (int) $this->getState('newsfeed.id');
 
-	/**
-	 * Method to get the newsfeed data
-	 *
-	 * @since 1.5
-	 */
-	function &getData()
-	{
-		// Load the weblink data
-		if ($this->_loadData())
+		if ($this->_item === null)
 		{
-			// Initialize some variables
-			$user = &JFactory::getUser();
-
-			// Make sure the category is published
-			if (!$this->_data->published) {
-				JError::raiseError(404, JText::_("Resource Not Found"));
-				return false;
-			}
-
-			// Check to see if the category is published
-			if (!$this->_data->cat_pub) {
-				JError::raiseError( 404, JText::_("Resource Not Found") );
-				return;
-			}
-
-			// Check whether category access level allows access
-			if ($this->_data->cat_access > $user->get('aid', 0)) {
-				JError::raiseError( 403, JText::_('ALERTNOTAUTH') );
-				return;
-			}
-
+			$this->_item = array();
 		}
 
-		return $this->_data;
+		if (!isset($this->_item[$pk]))
+		{
+			try
+			{
+				$db = $this->getDbo();
+				$query = $db->getQuery(true)
+					->select($this->getState('item.select', 'a.*'))
+					->from('#__newsfeeds AS a');
+
+				// Join on category table.
+				$query->select('c.title AS category_title, c.alias AS category_alias, c.access AS category_access')
+					->join('LEFT', '#__categories AS c on c.id = a.catid');
+
+				// Join on user table.
+				$query->select('u.name AS author')
+					->join('LEFT', '#__users AS u on u.id = a.created_by');
+
+				// Join over the categories to get parent category titles
+				$query->select('parent.title as parent_title, parent.id as parent_id, parent.path as parent_route, parent.alias as parent_alias')
+					->join('LEFT', '#__categories as parent ON parent.id = c.parent_id')
+
+					->where('a.id = ' . (int) $pk);
+
+				// Filter by start and end dates.
+				$nullDate = $db->quote($db->getNullDate());
+				$nowDate = $db->quote(JFactory::getDate()->toSql());
+
+				// Filter by published state.
+				$published = $this->getState('filter.published');
+				$archived = $this->getState('filter.archived');
+				if (is_numeric($published))
+				{
+					$query->where('(a.published = ' . (int) $published . ' OR a.published =' . (int) $archived . ')')
+						->where('(a.publish_up = ' . $nullDate . ' OR a.publish_up <= ' . $nowDate . ')')
+						->where('(a.publish_down = ' . $nullDate . ' OR a.publish_down >= ' . $nowDate . ')')
+						->where('(c.published = ' . (int) $published . ' OR c.published =' . (int) $archived . ')');
+				}
+
+				$db->setQuery($query);
+
+				$data = $db->loadObject();
+
+				if (empty($data))
+				{
+					JError::raiseError(404, JText::_('COM_NEWSFEEDS_ERROR_FEED_NOT_FOUND'));
+				}
+
+				// Check for published state if filter set.
+				if (((is_numeric($published)) || (is_numeric($archived))) && (($data->published != $published) && ($data->published != $archived)))
+				{
+					JError::raiseError(404, JText::_('COM_NEWSFEEDS_ERROR_FEED_NOT_FOUND'));
+				}
+
+				// Convert parameter fields to objects.
+				$registry = new JRegistry;
+				$registry->loadString($data->params);
+				$data->params = clone $this->getState('params');
+				$data->params->merge($registry);
+
+				$registry = new JRegistry;
+				$registry->loadString($data->metadata);
+				$data->metadata = $registry;
+
+				// Compute access permissions.
+				if ($access = $this->getState('filter.access'))
+				{
+					// If the access filter has been set, we already know this user can view.
+					$data->params->set('access-view', true);
+				}
+				else {
+					// If no access filter is set, the layout takes some responsibility for display of limited information.
+					$user = JFactory::getUser();
+					$groups = $user->getAuthorisedViewLevels();
+					$data->params->set('access-view', in_array($data->access, $groups) && in_array($data->category_access, $groups));
+				}
+
+				$this->_item[$pk] = $data;
+			}
+			catch (Exception $e)
+			{
+				$this->setError($e);
+				$this->_item[$pk] = false;
+			}
+		}
+
+		return $this->_item[$pk];
 	}
 
 	/**
-	 * Method to load newsfeed data
+	 * Increment the hit counter for the newsfeed.
 	 *
-	 * @access	private
-	 * @return	boolean	True on success
-	 * @since	1.5
+	 * @param   int  $pk  Optional primary key of the item to increment.
+	 *
+	 * @return  boolean  True if successful; false otherwise and internal error set.
+	 *
+	 * @since   3.0
 	 */
-	function _loadData()
+	public function hit($pk = 0)
 	{
-		// Lets load the content if it doesn't already exist
-		if (empty($this->_data))
+		$input = JFactory::getApplication()->input;
+		$hitcount = $input->getInt('hitcount', 1);
+
+		if ($hitcount)
 		{
-			$query = 'SELECT f.*, cc.title AS category,'.
-					' cc.published AS cat_pub, cc.access AS cat_access,'.
-					' CASE WHEN CHAR_LENGTH(cc.alias) THEN CONCAT_WS(\':\', cc.id, cc.alias) ELSE cc.id END as catslug'.
-					' FROM #__newsfeeds AS f' .
-					' LEFT JOIN #__categories AS cc ON cc.id = f.catid' .
-					' WHERE f.id = '.$this->_id;
-			$this->_db->setQuery($query);
-			$this->_data = $this->_db->loadObject();
-			return (boolean) $this->_data;
+			$pk = (!empty($pk)) ? $pk : (int) $this->getState('newsfeed.id');
+
+			$table = JTable::getInstance('Newsfeed', 'NewsfeedsTable');
+			$table->load($pk);
+			$table->hit($pk);
 		}
+
 		return true;
 	}
-
 }
-?>

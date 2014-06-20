@@ -1,73 +1,145 @@
 <?php
 /**
- * @version		$Id: router.php 14401 2010-01-26 14:10:00Z louis $
- * @package		Joomla
- * @subpackage	Banners
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
- * @license		GNU/GPL, see LICENSE.php
- * Joomla! is free software. This version may have been modified pursuant to the
- * GNU General Public License, and as distributed it includes or is derivative
- * of works licensed under the GNU General Public License or other free or open
- * source software licenses. See COPYRIGHT.php for copyright notices and
- * details.
+ * @package     Joomla.Site
+ * @subpackage  com_banners
+ *
+ * @copyright   Copyright (C) 2005 - 2014 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
+
+defined('_JEXEC') or die;
 
 /**
- * @param	array	A named array
- * @return	array
+ * Routing class from com_banners
+ *
+ * @package     Joomla.Site
+ * @subpackage  com_banners
+ * @since       3.3
  */
-function BannersBuildRoute( &$query )
+class BannersRouter extends JComponentRouterBase
 {
-	$segments = array();
+	/**
+	 * Build the route for the com_banners component
+	 *
+	 * @param   array  &$query  An array of URL arguments
+	 *
+	 * @return  array  The URL arguments to use to assemble the subsequent URL.
+	 *
+	 * @since   3.3
+	 */
+	public function build(&$query)
+	{
+		$segments = array();
 
-	if (isset($query['task'])) {
-		$segments[] = $query['task'];
-		unset( $query['task'] );
-	}
-	if (isset($query['bid'])) {
-		$segments[] = $query['bid'];
-		unset( $query['bid'] );
+		if (isset($query['task']))
+		{
+			$segments[] = $query['task'];
+			unset($query['task']);
+		}
+
+		if (isset($query['id']))
+		{
+			$segments[] = $query['id'];
+			unset($query['id']);
+		}
+
+		$total = count($segments);
+
+		for ($i = 0; $i < $total; $i++)
+		{
+			$segments[$i] = str_replace(':', '-', $segments[$i]);
+		}
+
+		return $segments;
 	}
 
-	return $segments;
+	/**
+	 * Parse the segments of a URL.
+	 *
+	 * @param   array  &$segments  The segments of the URL to parse.
+	 *
+	 * @return  array  The URL attributes to be used by the application.
+	 *
+	 * @since   3.3
+	 */
+	public function parse(&$segments)
+	{
+		$total = count($segments);
+		$vars = array();
+
+		for ($i = 0; $i < $total; $i++)
+		{
+			$segments[$i] = preg_replace('/-/', ':', $segments[$i], 1);
+		}
+
+		// View is always the first element of the array
+		$count = count($segments);
+
+		if ($count)
+		{
+			$count--;
+			$segment = array_shift($segments);
+
+			if (is_numeric($segment))
+			{
+				$vars['id'] = $segment;
+			}
+			else
+			{
+				$vars['task'] = $segment;
+			}
+		}
+
+		if ($count)
+		{
+			$segment = array_shift($segments);
+
+			if (is_numeric($segment))
+			{
+				$vars['id'] = $segment;
+			}
+		}
+
+		return $vars;
+	}
 }
 
 /**
- * @param	array	A named array
- * @param	array
+ * Build the route for the com_banners component
  *
- * Formats:
+ * This function is a proxy for the new router interface
+ * for old SEF extensions.
  *
- * index.php?/banners/task/bid/Itemid
+ * @param   array  &$query  An array of URL arguments
  *
- * index.php?/banners/bid/Itemid
+ * @return  array  The URL arguments to use to assemble the subsequent URL.
+ *
+ * @since   3.3
+ * @deprecated  4.0  Use Class based routers instead
  */
-function BannersParseRoute( $segments )
+function BannersBuildRoute(&$query)
 {
-	$vars = array();
+	$router = new BannersRouter;
 
-	// view is always the first element of the array
-	$count = count($segments);
+	return $router->build($query);
+}
 
-	if ($count)
-	{
-		$count--;
-		$segment = array_shift( $segments );
-		if (is_numeric( $segment )) {
-			$vars['bid'] = $segment;
-		} else {
-			$vars['task'] = $segment;
-		}
-	}
+/**
+ * Parse the segments of a URL.
+ *
+ * This function is a proxy for the new router interface
+ * for old SEF extensions.
+ *
+ * @param   array  $segments  The segments of the URL to parse.
+ *
+ * @return  array  The URL attributes to be used by the application.
+ *
+ * @since   3.3
+ * @deprecated  4.0  Use Class based routers instead
+ */
+function BannersParseRoute($segments)
+{
+	$router = new BannersRouter;
 
-	if ($count)
-	{
-		$count--;
-		$segment = array_shift( $segments) ;
-		if (is_numeric( $segment )) {
-			$vars['bid'] = $segment;
-		}
-	}
-
-	return $vars;
+	return $router->parse($segments);
 }

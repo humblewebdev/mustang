@@ -1,46 +1,49 @@
 <?php
 /**
- * @version		$Id: controller.php 14401 2010-01-26 14:10:00Z louis $
- * @package		Joomla
- * @subpackage	Content
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
- * @license		GNU/GPL, see LICENSE.php
- * Joomla! is free software. This version may have been modified pursuant to the
- * GNU General Public License, and as distributed it includes or is derivative
- * of works licensed under the GNU General Public License or other free or open
- * source software licenses. See COPYRIGHT.php for copyright notices and
- * details.
+ * @package     Joomla.Site
+ * @subpackage  com_newsfeeds
+ *
+ * @copyright   Copyright (C) 2005 - 2014 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// Check to ensure this file is included in Joomla!
-defined('_JEXEC') or die( 'Restricted access' );
-
-jimport('joomla.application.component.controller');
+defined('_JEXEC') or die;
 
 /**
  * Newsfeeds Component Controller
  *
- * @package		Joomla
- * @subpackage	Newsfeeds
- * @since 1.5
+ * @package     Joomla.Site
+ * @subpackage  com_newsfeeds
+ * @since       1.5
  */
-class NewsfeedsController extends JController
+class NewsfeedsController extends JControllerLegacy
 {
 	/**
 	 * Method to show a newsfeeds view
 	 *
-	 * @access	public
-	 * @since	1.5
+	 * @param   boolean			If true, the view output will be cached
+	 * @param   array  An array of safe url parameters and their variable types, for valid values see {@link JFilterInput::clean()}.
+	 *
+	 * @return  JController		This object to support chaining.
+	 * @since   1.5
 	 */
-	function display()
+	public function display($cachable = false, $urlparams = false)
 	{
-		// Set a default view if none exists
-		if ( ! JRequest::getCmd( 'view' ) ) {
-			JRequest::setVar('view', 'categories' );
+		$cachable = true;
+
+		// Set the default view name and format from the Request.
+		$vName = $this->input->get('view', 'categories');
+		$this->input->set('view', $vName);
+
+		$user = JFactory::getUser();
+
+		if ($user->get('id') || ($this->input->getMethod() == 'POST' && $vName = 'category' ))
+		{
+			$cachable = false;
 		}
 
-		parent::display();
+		$safeurlparams = array('id' => 'INT', 'limit' => 'UINT', 'limitstart' => 'UINT', 'filter_order' => 'CMD', 'filter_order_Dir' => 'CMD', 'lang' => 'CMD');
+
+		parent::display($cachable, $safeurlparams);
 	}
 }
-
-?>

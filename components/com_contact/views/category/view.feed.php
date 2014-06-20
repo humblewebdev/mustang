@@ -1,89 +1,43 @@
 <?php
 /**
- * @version		$Id: view.feed.php 14401 2010-01-26 14:10:00Z louis $
- * @package		Joomla
- * @subpackage	Contact
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
- * @license		GNU/GPL, see LICENSE.php
- * Joomla! is free software. This version may have been modified pursuant to the
- * GNU General Public License, and as distributed it includes or is derivative
- * of works licensed under the GNU General Public License or other free or open
- * source software licenses. See COPYRIGHT.php for copyright notices and
- * details.
+ * @package     Joomla.Site
+ * @subpackage  com_contact
+ *
+ * @copyright   Copyright (C) 2005 - 2014 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// Check to ensure this file is included in Joomla!
-defined('_JEXEC') or die( 'Restricted access' );
-
-jimport('joomla.application.component.view');
+defined('_JEXEC') or die;
 
 /**
- * @pacakge Joomla
- * @subpackage	Contacts
+ * HTML View class for the Contact component
+ *
+ * @package     Joomla.Site
+ * @subpackage  com_contact
+ * @since       1.5
  */
-class ContactViewCategory extends JView
+class ContactViewCategory extends JViewCategoryfeed
 {
-	function display()
+	/**
+	 * @var    string  The name of the view to link individual items to
+	 * @since  3.2
+	 */
+	protected $viewName = 'contact';
+
+	/**
+	 * Method to reconcile non standard names from components to usage in this class.
+	 * Typically overriden in the component feed view class.
+	 *
+	 * @param   object  $item  The item for a feed, an element of the $items array.
+	 *
+	 * @return  void
+	 *
+	 * @since   3.2
+	 */
+	protected function reconcileNames($item)
 	{
-		global $mainframe;
+		parent::reconcileNames($item);
 
-		$db			=& JFactory::getDBO();
-		$document	=& JFactory::getDocument();
-		$document->link = JRoute::_('index.php?option=com_contact&view=category&catid='.JRequest::getVar('catid',null, '', 'int'));
-		
-		$siteEmail = $mainframe->getCfg('mailfrom');
-		$fromName = $mainframe->getCfg('fromname');
-		$document->editor = $fromName;
-		$document->editorEmail = $siteEmail;
-				
-		$limit 		= JRequest::getVar('limit', $mainframe->getCfg('feed_limit'), '', 'int');
-		$limitstart = JRequest::getVar('limitstart', 0, '', 'int');
-		$catid  	= JRequest::getVar('catid', 0, '', 'int');
-
-		$where		= ' WHERE a.published = 1';
-
-		if ( $catid ) {
-			$where .= ' AND a.catid = '. (int) $catid;
-		}
-
-		$query = 'SELECT'
-		. ' a.name AS title,'
-		. ' CONCAT( a.con_position, \' - \', a.misc ) AS description,'
-		. ' "" AS date,'
-		. ' c.title AS category,'
-		. ' CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(":", a.id, a.alias) ELSE a.id END as slug,'
-		. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(":", c.id, c.alias) ELSE c.id END as catslug'
-		. ' FROM #__contact_details AS a'
-		. ' LEFT JOIN #__categories AS c ON c.id = a.catid'
-		. $where
-		. ' ORDER BY a.catid, a.ordering'
-		;
-		$db->setQuery( $query, 0, $limit );
-		$rows = $db->loadObjectList();
-
-		foreach ( $rows as $row )
-		{
-			// strip html from feed item title
-			$title = $this->escape( $row->title );
-			$title = html_entity_decode( $title );
-
-			// url link to article
-			$link = JRoute::_('index.php?option=com_contact&view=contact&id='. $row->slug .'&catid='.$row->catslug );
-
-			// strip html from feed item description text
-			$description = $row->description;
-			$date = ( $row->date ? date( 'r', strtotime($row->date) ) : '' );
-
-			// load individual item creator class
-			$item = new JFeedItem();
-			$item->title 		= $title;
-			$item->link 		= $link;
-			$item->description 	= $description;
-			$item->date			= $date;
-			$item->category   	= $row->category;
-
-			// loads item info into rss array
-			$document->addItem( $item );
-		}
+		$item->description = $item->address;
 	}
 }

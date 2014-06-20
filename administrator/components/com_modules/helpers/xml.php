@@ -1,44 +1,48 @@
 <?php
 /**
- * @version		$Id: xml.php 14401 2010-01-26 14:10:00Z louis $
- * @package		Joomla
- * @subpackage	Modules
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
- * @license		GNU/GPL, see LICENSE.php
- * Joomla! is free software. This version may have been modified pursuant
- * to the GNU General Public License, and as distributed it includes or
- * is derivative of works licensed under the GNU General Public License or
- * other free or open source software licenses.
- * See COPYRIGHT.php for copyright notices and details.
+ * @package     Joomla.Administrator
+ * @subpackage  com_modules
+ *
+ * @copyright   Copyright (C) 2005 - 2014 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// no direct access
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die;
+
+JLog::add('ModulesHelperXML is deprecated. Do not use.', JLog::WARNING, 'deprecated');
 
 /**
- * @package		Joomla
- * @subpackage	Modules
+ * Helper for parse XML module files
+ *
+ * @package     Joomla.Administrator
+ * @subpackage  com_modules
+ * @since       1.5
+ * @deprecated  3.2  Do not use.
  */
 class ModulesHelperXML
 {
-	function parseXMLModuleFile( &$rows  )
+	/**
+	 * @since       1.5
+	 * @deprecated  3.2  Do not use.
+	 */
+	public function parseXMLModuleFile(&$rows)
 	{
 		foreach ($rows as $i => $row)
 		{
 			if ($row->module == '')
 			{
-				$rows[$i]->name 	= 'custom';
-				$rows[$i]->module 	= 'custom';
-				$rows[$i]->descrip 	= 'Custom created module, using Module Manager `New` function';
+				$rows[$i]->name    = 'custom';
+				$rows[$i]->module  = 'custom';
+				$rows[$i]->descrip = 'Custom created module, using Module Manager New function';
 			}
 			else
 			{
-				$data = JApplicationHelper::parseXMLInstallFile( $row->path.DS.$row->file);
+				$data = JInstaller::parseXMLInstallFile($row->path . '/' . $row->file);
 
-				if ( $data['type'] == 'module' )
+				if ($data['type'] == 'module')
 				{
-					$rows[$i]->name		= $data['name'];
-					$rows[$i]->descrip	= $data['description'];
+					$rows[$i]->name    = $data['name'];
+					$rows[$i]->descrip = $data['description'];
 				}
 			}
 		}

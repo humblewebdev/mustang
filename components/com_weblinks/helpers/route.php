@@ -1,81 +1,241 @@
 <?php
 /**
- * @version		$Id: route.php 14401 2010-01-26 14:10:00Z louis $
- * @package		Joomla
- * @subpackage	Weblinks
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
- * @license		GNU/GPL, see LICENSE.php
- * Joomla! is free software. This version may have been modified pursuant to the
- * GNU General Public License, and as distributed it includes or is derivative
- * of works licensed under the GNU General Public License or other free or open
- * source software licenses. See COPYRIGHT.php for copyright notices and
- * details.
+ * @package     Joomla.Site
+ * @subpackage  com_weblinks
+ *
+ * @copyright   Copyright (C) 2005 - 2014 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// no direct access
-defined('_JEXEC') or die('Restricted access');
-
-// Component Helper
-jimport('joomla.application.component.helper');
+defined('_JEXEC') or die;
 
 /**
  * Weblinks Component Route Helper
  *
  * @static
- * @package		Joomla
- * @subpackage	Weblinks
- * @since 1.5
+ * @package     Joomla.Site
+ * @subpackage  com_weblinks
+ * @since       1.5
  */
-class WeblinksHelperRoute
+abstract class WeblinksHelperRoute
 {
-	function getWeblinkRoute($id, $catid) {
+	protected static $lookup;
+
+	protected static $lang_lookup = array();
+
+	/**
+	 * @param   integer  The route of the weblink
+	 */
+	public static function getWeblinkRoute($id, $catid, $language = 0)
+	{
 		$needles = array(
-			'category' => (int) $catid,
-			'categories' => null
+			'weblink'  => array((int) $id)
 		);
 
-		//Find the itemid
-		$itemid = WeblinksHelperRoute::_findItem($needles);
-		$itemid = $itemid ? '&Itemid='.$itemid : '';
-
 		//Create the link
-		$link = 'index.php?option=com_weblinks&view=weblink&id='. $id . '&catid='.$catid . $itemid;
+		$link = 'index.php?option=com_weblinks&view=weblink&id='. $id;
+
+		if ($catid > 1)
+		{
+			$categories = JCategories::getInstance('Weblinks');
+			$category = $categories->get($catid);
+
+			if ($category)
+			{
+				$needles['category'] = array_reverse($category->getPath());
+				$needles['categories'] = $needles['category'];
+				$link .= '&catid='.$catid;
+			}
+		}
+
+		if ($language && $language != "*" && JLanguageMultilang::isEnabled())
+		{
+			self::buildLanguageLookup();
+
+			if (isset(self::$lang_lookup[$language]))
+			{
+				$link .= '&lang=' . self::$lang_lookup[$language];
+				$needles['language'] = $language;
+			}
+		}
+
+		if ($item = self::_findItem($needles))
+		{
+			$link .= '&Itemid='.$item;
+		}
 
 		return $link;
 	}
 
-	function _findItem($needles)
+	/**
+	 * @param   integer  $id		The id of the weblink.
+	 * @param   string	$return	The return page variable.
+	 */
+	public static function getFormRoute($id, $return = null)
 	{
-		static $items;
-
-		if (!$items)
+		// Create the link.
+		if ($id)
 		{
-			$component =& JComponentHelper::getComponent('com_weblinks');
-			$menu = &JSite::getMenu();
-			$items = $menu->getItems('componentid', $component->id);
+			$link = 'index.php?option=com_weblinks&task=weblink.edit&w_id='. $id;
+		}
+		else
+		{
+			$link = 'index.php?option=com_weblinks&task=weblink.add&w_id=0';
 		}
 
-		if (!is_array($items)) {
-			return null;
+		if ($return)
+		{
+			$link .= '&return='.$return;
 		}
 
-		$match = null;
-		foreach($needles as $needle => $id)
+		return $link;
+	}
+
+	public static function getCategoryRoute($catid, $language = 0)
+	{
+		if ($catid instanceof JCategoryNode)
 		{
-			foreach($items as $item)
+			$id = $catid->id;
+			$category = $catid;
+		}
+		else
+		{
+			$id = (int) $catid;
+			$category = JCategories::getInstance('Weblinks')->get($id);
+		}
+
+		if ($id < 1 || !($category instanceof JCategoryNode))
+		{
+			$link = '';
+		}
+		else
+		{
+			$needles = array();
+
+			// Create the link
+			$link = 'index.php?option=com_weblinks&view=category&id='.$id;
+
+			$catids = array_reverse($category->getPath());
+			$needles['category'] = $catids;
+			$needles['categories'] = $catids;
+
+			if ($language && $language != "*" && JLanguageMultilang::isEnabled())
 			{
-				if ((@$item->query['view'] == $needle) && (@$item->query['id'] == $id)) {
-					$match = $item->id;
-					break;
+				self::buildLanguageLookup();
+
+				if (isset(self::$lang_lookup[$language]))
+				{
+					$link .= '&lang=' . self::$lang_lookup[$language];
+					$needles['language'] = $language;
 				}
 			}
 
-			if(isset($match)) {
-				break;
+			if ($item = self::_findItem($needles))
+			{
+				$link .= '&Itemid='.$item;
 			}
 		}
 
-		return $match;
+		return $link;
+	}
+
+	protected static function buildLanguageLookup()
+	{
+		if (count(self::$lang_lookup) == 0)
+		{
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true)
+				->select('a.sef AS sef')
+				->select('a.lang_code AS lang_code')
+				->from('#__languages AS a');
+
+			$db->setQuery($query);
+			$langs = $db->loadObjectList();
+
+			foreach ($langs as $lang)
+			{
+				self::$lang_lookup[$lang->lang_code] = $lang->sef;
+			}
+		}
+	}
+
+	protected static function _findItem($needles = null)
+	{
+		$app		= JFactory::getApplication();
+		$menus		= $app->getMenu('site');
+		$language	= isset($needles['language']) ? $needles['language'] : '*';
+
+		// Prepare the reverse lookup array.
+		if (!isset(self::$lookup[$language]))
+		{
+			self::$lookup[$language] = array();
+
+			$component	= JComponentHelper::getComponent('com_weblinks');
+
+			$attributes = array('component_id');
+			$values = array($component->id);
+
+			if ($language != '*')
+			{
+				$attributes[] = 'language';
+				$values[] = array($needles['language'], '*');
+			}
+
+			$items = $menus->getItems($attributes, $values);
+
+			if ($items)
+			{
+				foreach ($items as $item)
+				{
+					if (isset($item->query) && isset($item->query['view']))
+					{
+						$view = $item->query['view'];
+						if (!isset(self::$lookup[$language][$view]))
+						{
+							self::$lookup[$language][$view] = array();
+						}
+						if (isset($item->query['id']))
+						{
+
+							// here it will become a bit tricky
+							// language != * can override existing entries
+							// language == * cannot override existing entries
+							if (!isset(self::$lookup[$language][$view][$item->query['id']]) || $item->language != '*')
+							{
+								self::$lookup[$language][$view][$item->query['id']] = $item->id;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if ($needles)
+		{
+			foreach ($needles as $view => $ids)
+			{
+				if (isset(self::$lookup[$language][$view]))
+				{
+					foreach ($ids as $id)
+					{
+						if (isset(self::$lookup[$language][$view][(int) $id]))
+						{
+							return self::$lookup[$language][$view][(int) $id];
+						}
+					}
+				}
+			}
+		}
+
+		// Check if the active menuitem matches the requested language
+		$active = $menus->getActive();
+		if ($active && ($language == '*' || in_array($active->language, array('*', $language)) || !JLanguageMultilang::isEnabled()))
+		{
+			return $active->id;
+		}
+
+		// If not found, return language specific home link
+		$default = $menus->getDefault($language);
+		return !empty($default->id) ? $default->id : null;
 	}
 }
-?>

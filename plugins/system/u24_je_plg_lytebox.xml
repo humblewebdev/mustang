@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5.0" type="plugin" group="system" method="upgrade">
+  <name>U24 - Lytebox</name>
+  <author>Holyfield Studios</author>
+  <creationDate>January 2009</creationDate>
+  <copyright>Copyright (C) 2008 Holder. All rights reserved.</copyright>
+  <license>Free</license>
+  <authorEmail>je@unison24.com</authorEmail>
+  <authorUrl>http://je.unison24.com</authorUrl>
+  <version>3.22</version>
+  <description>Lytebox for Joomla by Unison24</description>
+  <files>
+    <filename plugin="u24_je_plg_lytebox">u24_je_plg_lytebox.php</filename>
+    <filename>u24_je_plg_lytebox-class.php</filename>
+    <filename>u24_je_plg_lytebox-j10.php</filename>
+    <filename>u24_je_plg_lytebox-j15.php</filename>
+    <filename>u24/index.htm</filename>
+    <filename>u24/lytebox/index.htm</filename>
+    <!-- lYTEBOX -->
+    <filename>u24/lytebox/3.22/lytebox.css</filename>
+    <filename>u24/lytebox/3.22/lytebox.js</filename>
+    <filename>u24/lytebox/3.22/lytebox.original.js</filename>
+    <filename>u24/lytebox/3.22/index.htm</filename>
+    <!-- lYTEBOX IMAGES -->
+    <filename>u24/lytebox/3.22/images/blank.gif</filename>
+    <filename>u24/lytebox/3.22/images/close_blue.png</filename>
+    <filename>u24/lytebox/3.22/images/close_gold.png</filename>
+    <filename>u24/lytebox/3.22/images/close_green.png</filename>
+    <filename>u24/lytebox/3.22/images/close_grey.png</filename>
+    <filename>u24/lytebox/3.22/images/close_red.png</filename>
+    <filename>u24/lytebox/3.22/images/index.htm</filename>
+    <filename>u24/lytebox/3.22/images/loading.gif</filename>
+    <filename>u24/lytebox/3.22/images/next_blue.gif</filename>
+    <filename>u24/lytebox/3.22/images/next_gold.gif</filename>
+    <filename>u24/lytebox/3.22/images/next_green.gif</filename>
+    <filename>u24/lytebox/3.22/images/next_grey.gif</filename>
+    <filename>u24/lytebox/3.22/images/next_red.gif</filename>
+    <filename>u24/lytebox/3.22/images/pause_blue.png</filename>
+    <filename>u24/lytebox/3.22/images/pause_gold.png</filename>
+    <filename>u24/lytebox/3.22/images/pause_green.png</filename>
+    <filename>u24/lytebox/3.22/images/pause_grey.png</filename>
+    <filename>u24/lytebox/3.22/images/pause_red.png</filename>
+    <filename>u24/lytebox/3.22/images/play_blue.png</filename>
+    <filename>u24/lytebox/3.22/images/play_gold.png</filename>
+    <filename>u24/lytebox/3.22/images/play_green.png</filename>
+    <filename>u24/lytebox/3.22/images/play_grey.png</filename>
+    <filename>u24/lytebox/3.22/images/play_red.png</filename>
+    <filename>u24/lytebox/3.22/images/prev_blue.gif</filename>
+    <filename>u24/lytebox/3.22/images/prev_gold.gif</filename>
+    <filename>u24/lytebox/3.22/images/prev_green.gif</filename>
+    <filename>u24/lytebox/3.22/images/prev_grey.gif</filename>
+    <filename>u24/lytebox/3.22/images/prev_red.gif</filename>
+  </files>
+  <params>
+    <param type="spacer" />
+    <param type="spacer" default="User Customizations" />
+    <param name="useCustom" type="radio" default="0" label="Use Custom JS" description="Controls whether or not to use custommizations below.">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </param>
+	    <param name="updateInterval" type="text" default="8760" label="Update Interval" description="Determines how often to update javascript file parameters with user defined values. Default value is 8760 hours (365 days). 0 disables auto update and javascript is updated only once after saving current changes." size="6" />
+    <param type="spacer" />
+    <param type="spacer" default="Global Configuration" />
+    <param name="lyversion" type="folderlist" default="" label="Version" directory="plugins/system/u24/lytebox" filter="" exclude="" stripext="" />
+    <param name="theme" type="list" default="grey" label="Themes" description="Themes: grey (default), red, green, blue, gold">
+      <option value="grey">grey</option>
+      <option value="red">red</option>
+      <option value="green">green</option>
+      <option value="blue">blue</option>
+      <option value="gold">gold</option>
+    </param>
+    <param name="hideFlash" type="radio" default="1" label="Hide Flash" description="Controls whether or not Flash objects should be hidden">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </param>
+    <param name="outerBorder" type="radio" default="0" label="Outer Border" description="Controls whether to show the outer grey (or theme) borders">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </param>
+    <param name="resizeSpeed" type="list" default="8" label="Resize Speed" description="Controls the speed of the image resizing (1=slowest and 10=fastest)">
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+      <option value="8">8</option>
+      <option value="9">9</option>
+      <option value="10">10</option>
+    </param>
+    <param name="maxOpacity" type="list" default="80" label="Max Opacity" description="Higher opacity = darker overlay, lower opacity = lighter overlay">
+      <option value="5">5</option>
+      <option value="10">10</option>
+      <option value="15">15</option>
+      <option value="20">20</option>
+      <option value="25">25</option>
+      <option value="30">30</option>
+      <option value="35">35</option>
+      <option value="40">40</option>
+      <option value="45">45</option>
+      <option value="50">50</option>
+      <option value="55">55</option>
+      <option value="60">60</option>
+      <option value="65">65</option>
+      <option value="70">70</option>
+      <option value="75">75</option>
+      <option value="80">80</option>
+      <option value="85">85</option>
+      <option value="90">90</option>
+      <option value="95">95</option>
+      <option value="100">100</option>
+    </param>
+    <param name="navType" type="list" default="1" label="Navigation Type" description="´Prev/Next´ buttons on top left and left (default), 2 = ´&lt;&lt; prev | next &gt;&gt;´ links next to image number">
+      <option value="1">Prev/Next</option>
+      <option value="2">&lt;&lt; prev | next &gt;&gt;</option>
+    </param>
+    <param name="autoResize" type="radio" default="1" label="Auto Resize" description="Controls whether or not images should be resized if larger than the browser window dimensions">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </param>
+    <param name="doAnimations" type="radio" default="1" label="Do Animations" description="Controls whether or not ´animate´ Lytebox, i.e. resize transition between images, fade in/out effects, etc.">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </param>
+    <param name="borderSize" type="text" default="12" label="Border Size" description="If you adjust the padding in the CSS, you will need to update this publiciable -- otherwise, leave this alone..." size="6" />
+    <param type="spacer" />
+    <param type="spacer" default="Slideshow Options" />
+    <param name="slideInterval" type="text" default="4000" label="Slide Interval" description="Change value (milliseconds) to increase/decrease the time between ´slides´ (10000 = 10 seconds)" size="6" />
+    <param name="showNavigation" type="radio" default="1" label="Show Navigation" description="TRUE to display Next/Prev buttons/text during slideshow, FALSE to hide">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </param>
+    <param name="showClose" type="radio" default="1" label="Show Close" description="TRUE to display the Close button, FALSE to hide">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </param>
+    <param name="showDetails" type="radio" default="1" label="Show Details" description="TRUE to display image details (caption, count), FALSE to hide">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </param>
+    <param name="showPlayPause" type="radio" default="1" label="Show Play Pause" description="TRUE to display pause/play buttons next to close button, FALSE to hide">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </param>
+    <param name="autoEnd" type="radio" default="1" label="Auto End" description="TRUE to automatically close Lytebox after the last image is reached, FALSE to keep open">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </param>
+    <param name="pauseOnNextClick" type="radio" default="0" label="Pause On Next Click" description="TRUE to pause the slideshow when the ´Next´ button is clicked">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </param>
+    <param name="pauseOnPrevClick" type="radio" default="1" label="Pause On Prev Click" description="TRUE to pause the slideshow when the ´Prev´ button is clicked">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </param>
+  </params>
+</install>
